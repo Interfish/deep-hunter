@@ -1,0 +1,11 @@
+data.sqlite3
+logs
+!logs/.keep
+!pickles/.keep
+events.out*
+.vscode
+__pycache__
+.DS_Store
+prepare.sh
+train.sh
+test
