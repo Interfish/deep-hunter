@@ -9,7 +9,7 @@ import os
 import sys
 
 class BiDirectionalGRU:
-    def __init__(self,
+    def load_hparams(self,
                  max_char_num=128,
                  fw_num_units=20,
                  bw_num_units=20,
@@ -18,6 +18,7 @@ class BiDirectionalGRU:
         self.fw_num_units = fw_num_units
         self.bw_num_units = bw_num_units
         self.loss_weight_fraction = loss_weight_fraction
+        return self
 
     def build_model(self):
         print('[info] Constructing Computation Graph ...', flush=True)
@@ -82,3 +83,10 @@ class BiDirectionalGRU:
             'train_merge': train_merge,
             'test_merge': test_merge
         }
+
+    def restore_model(sess, graph_path, checkpoint_path):
+        saver = tf.train.import_meta_graph(graph_path)
+        saver.restore(sess, checkpoint_path)
+
+    def predict(sess, input_code):
+        pass
