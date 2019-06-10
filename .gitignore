@@ -6,6 +6,4 @@ events.out*
 .vscode
 __pycache__
 .DS_Store
-prepare.sh
-train.sh
 test

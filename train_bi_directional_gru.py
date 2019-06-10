@@ -33,7 +33,6 @@ if __name__ == '__main__':
         for i, X_batch, y_batch in prepare_data.mini_batch(X_train, y_train, batch_size=hparams['batch_size']):
             if i > hparams['iter']:
                 break
-            print(X_batch)
             X_batch, y_batch, seq_length = prepare_data.convert_to_ascii_code_with_padding(X_batch, y_batch)
             step_loss, accuracy, _ , train_summary = sess.run(
                 [ops['loss'], ops['accuracy'], ops['train_op'], ops['train_merge']],
@@ -66,6 +65,6 @@ if __name__ == '__main__':
             if (i % 500 == 0 or i == hparams['iter']) and i != 0:
                 save_dir = hparams['checkpoint_save_path']
                 os.system('mkdir -p %s' % save_dir)
-                save_path = saver.save(sess, save_dir + "/model", global_step=i, write_meta_graph=False)
+                save_path = saver.save(sess, save_dir + "/model", global_step=i)
                 print("Model saved in : %s" % save_path)
         writer.close()
