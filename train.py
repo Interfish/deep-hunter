@@ -25,6 +25,11 @@ if __name__ == '__main__':
     ops = model.build_model()
 
     with tf.Session() as sess:
+        if sys.argc == 2:
+            saver = tf.train.import_meta_graph("./trained_models/bi_directional_gru/model-{}.meta".format(sys.argv[1]))
+            saver.restore(sess, "./trained_models/bi_directional_gru/model-{}".format(sys.argv[1]))
+            graph = tf.get_default_graph()
+            print("[info] Restored model from iteration {}".format(sys.argv[1]), flush=True)
         print('[info] Start Trainning ...', flush=True)
         sess.run(tf.global_variables_initializer())
         sess.run(tf.local_variables_initializer())
