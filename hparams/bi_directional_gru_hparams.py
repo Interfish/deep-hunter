@@ -1,7 +1,7 @@
 def params():
     return {
         # trainning iteration
-        'iter' : 6000,
+        'iter' : 10000,
         # batch size
         'batch_size' : 128,
         # when tokenlize text, only take max_char_num chars which appear most frequently

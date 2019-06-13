@@ -25,18 +25,20 @@ if __name__ == '__main__':
     ops = model.build_model()
 
     with tf.Session() as sess:
-        if sys.argc == 2:
+        iteration = 0
+        if len(sys.argv) == 2:
             saver = tf.train.import_meta_graph("./trained_models/bi_directional_gru/model-{}.meta".format(sys.argv[1]))
             saver.restore(sess, "./trained_models/bi_directional_gru/model-{}".format(sys.argv[1]))
             graph = tf.get_default_graph()
             print("[info] Restored model from iteration {}".format(sys.argv[1]), flush=True)
+            iteration = int(sys.argv[1]) + 1
         print('[info] Start Trainning ...', flush=True)
         sess.run(tf.global_variables_initializer())
         sess.run(tf.local_variables_initializer())
         writer = tf.summary.FileWriter(hparams['log_path'], sess.graph)
         saver = tf.train.Saver(max_to_keep=100)
-        for i, X_batch, y_batch in prepare_data.mini_batch(X_train, y_train, batch_size=hparams['batch_size']):
-            if i > hparams['iter']:
+        for _, X_batch, y_batch in prepare_data.mini_batch(X_train, y_train, batch_size=hparams['batch_size']):
+            if iteration > hparams['iter']:
                 break
             X_batch, y_batch, seq_length = prepare_data.convert_to_ascii_code_with_padding(X_batch, y_batch)
             step_loss, accuracy, _ , train_summary = sess.run(
@@ -48,9 +50,9 @@ if __name__ == '__main__':
                     ops['max_len']: X_batch.shape[-1]
                 }
             )
-            writer.add_summary(train_summary, i)
-            print("Iteration %d, loss: %f, accuracy: %f" % (i, step_loss, accuracy), flush=True)
-            if i % 50 == 0:
+            writer.add_summary(train_summary, iteration)
+            print("Iteration %d, loss: %f, accuracy: %f" % (iteration, step_loss, accuracy), flush=True)
+            if iteration % 50 == 0:
                 loss, accuracy, precision, recall, test_summary = sess.run(
                     [ops['loss'], ops['accuracy'], ops['precision'], ops['recall'], ops['test_merge']],
                     feed_dict={
@@ -60,16 +62,16 @@ if __name__ == '__main__':
                         ops['max_len']: X_test.shape[-1]
                     }
                 )
-                writer.add_summary(test_summary, i)
+                writer.add_summary(test_summary, iteration)
                 print('>>>>>>>>>>>>>>>>>>>>>>', flush=True)
-                print("Iteration: %d" % i, flush=True)
+                print("Iteration: %d" % iteration, flush=True)
                 print("Loss: %f" % loss, flush=True)
                 print("Accuracy: %f" % accuracy, flush=True)
                 print("Precision: %f" % precision, flush=True)
                 print("Recall: %f" % recall, flush=True)
-            if (i % 500 == 0 or i == hparams['iter']) and i != 0:
+            if (iteration % 500 == 0 or iteration == hparams['iter']) and iteration != 0:
                 save_dir = hparams['checkpoint_save_path']
                 os.system('mkdir -p %s' % save_dir)
-                save_path = saver.save(sess, save_dir + "/model", global_step=i)
+                save_path = saver.save(sess, save_dir + "/model", global_step=iteration)
                 print("Model saved in : %s" % save_path)
         writer.close()
