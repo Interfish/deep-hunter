@@ -26,6 +26,8 @@ if __name__ == '__main__':
 
     with tf.Session() as sess:
         iteration = 0
+        sess.run(tf.global_variables_initializer())
+        sess.run(tf.local_variables_initializer())
         if len(sys.argv) == 2:
             saver = tf.train.Saver()
             # saver = tf.train.import_meta_graph("./trained_models/bi_directional_gru/model-{}.meta".format(sys.argv[1]))
@@ -34,8 +36,6 @@ if __name__ == '__main__':
             print("[info] Restored model from iteration {}".format(sys.argv[1]), flush=True)
             iteration = int(sys.argv[1]) + 1
         print('[info] Start Trainning ...', flush=True)
-        sess.run(tf.global_variables_initializer())
-        sess.run(tf.local_variables_initializer())
         writer = tf.summary.FileWriter(hparams['log_path'], sess.graph)
         saver = tf.train.Saver(max_to_keep=100)
         for _, X_batch, y_batch in prepare_data.mini_batch(X_train, y_train, batch_size=hparams['batch_size']):
@@ -75,4 +75,5 @@ if __name__ == '__main__':
                 os.system('mkdir -p %s' % save_dir)
                 save_path = saver.save(sess, save_dir + "/model", global_step=iteration)
                 print("Model saved in : %s" % save_path)
+            iteration += 1
         writer.close()
