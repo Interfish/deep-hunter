@@ -6,6 +6,8 @@ import prepare_data
 from hparams import *
 from lib import bi_directional_gru
 
+random_seed = 1234
+
 if __name__ == '__main__':
     print('[info] Preparing data ...', flush=True)
     data_hparams = data_hparams.params()
@@ -13,7 +15,7 @@ if __name__ == '__main__':
     X = prepare_data.load_data_with_mask(data_hparams['db_path'])
     X = prepare_data.convert_to_ascii_code(X)
     y = list(map(lambda x: x['mask'], X))
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=random_seed)
     X_test, y_test, test_seq_length = prepare_data.convert_to_ascii_code_with_padding(X_test, y_test)
 
     model = bi_directional_gru.BiDirectionalGRU().load_hparams(
@@ -42,6 +44,10 @@ if __name__ == '__main__':
             if iteration > hparams['iter']:
                 break
             X_batch, y_batch, seq_length = prepare_data.convert_to_ascii_code_with_padding(X_batch, y_batch)
+            print('======')
+            print(X_batch.shape)
+            print(seq_length.shape)
+            exit()
             step_loss, accuracy, _ , train_summary = sess.run(
                 [ops['loss'], ops['accuracy'], ops['train_op'], ops['train_merge']],
                 feed_dict={

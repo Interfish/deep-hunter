@@ -83,10 +83,3 @@ class BiDirectionalGRU:
             'train_merge': train_merge,
             'test_merge': test_merge
         }
-
-    def restore_model(sess, graph_path, checkpoint_path):
-        saver = tf.train.import_meta_graph(graph_path)
-        saver.restore(sess, checkpoint_path)
-
-    def predict(sess, input_code):
-        pass
